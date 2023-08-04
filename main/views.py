@@ -6,7 +6,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIV
 from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.views import APIView
 
 class GenderView(ListAPIView):
     queryset = Gender.objects.all()
@@ -93,5 +93,39 @@ class GetRegistrationView(ListAPIView):
     serializer_class = RegistrationSerializer
 
 
+class TeacherMoney(ListAPIView):
+    serializer_class = TeacherSerializer
+
+    def get_queryset(self):
+        teacher_money = Teacher.objects.order_by('-money')[:1]
+        return teacher_money
 
 
+class StudentsWithTeachersBySubject(ListAPIView):
+    serializer_class = RegistrationSerializer
+
+    def get_queryset(self):
+        subject_id = self.kwargs['subject_id']
+        return Registration.objects.filter(subject_id=subject_id).select_related('teacher')
+
+    from rest_framework.views import APIView
+    from rest_framework.response import Response
+    from rest_framework import status
+    from .models import Registration
+    from .serializers import RegistrationSerializer
+
+    class StudentRegistration(APIView):
+        def post(self, request):
+            serializer = RegistrationSerializer(data=request.data)
+            if serializer.is_valid():
+                subject = serializer.validated_data['subject']
+                teacher = Teacher.objects.filter(subject=subject).order_by('-money').first()
+
+                if teacher:
+                    registration = serializer.save(teacher=teacher)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response({"message": "No teacher available for the selected subject."},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

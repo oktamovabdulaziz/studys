@@ -7,10 +7,10 @@ class User(AbstractUser):
 
 
 class Gender(models.Model):
-    name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.gender
 
 
 class Subject(models.Model):
@@ -25,7 +25,7 @@ class Teacher(models.Model):
     name = models.CharField(max_length=255)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     activ = models.BooleanField(default=False)
-    price = models.IntegerField(default=0)
+    money = models.IntegerField()
 
     def __str__(self):
         return self.name
@@ -35,7 +35,6 @@ class Student(models.Model):
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     activ = models.BooleanField(default=False)
     price = models.IntegerField(default=0)
@@ -51,5 +50,8 @@ class Registration(models.Model):
     age = models.IntegerField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     register = models.BooleanField(default=False)
+
+
+
 
 

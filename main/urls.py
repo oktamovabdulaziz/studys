@@ -12,5 +12,6 @@ urlpatterns = [
     path("gender-student/<int:pk>/", GenderStudentView.as_view()),
     path("registration/", RegistrationView.as_view()),
     path("get-registration/", GetRegistrationView.as_view()),
+    path('teacher-money/', TeacherMoney.as_view()),
 
 ]
