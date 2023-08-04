@@ -10,6 +10,7 @@ urlpatterns = [
     path("student/", StudentView.as_view()),
     path("activ-student/", ActivStudentView.as_view()),
     path("gender-student/<int:pk>/", GenderStudentView.as_view()),
-    path("get-student/<int:pk>/", GetStudentView.as_view())
+    path("registration/", RegistrationView.as_view()),
+    path("get-registration/", GetRegistrationView.as_view()),
 
 ]

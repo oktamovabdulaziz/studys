@@ -8,8 +8,6 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-
-
 class GenderView(ListAPIView):
     queryset = Gender.objects.all()
     serializer_class = GenderSerializer
@@ -77,21 +75,23 @@ class GenderStudentView(ListAPIView):
         return Response({"count": len(students)})
 
 
+class RegistrationView(CreateAPIView):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer
 
-class GetStudentView(ListAPIView):
-    queryset = Student.objects.all()
-    serializer_class = TeacherSerializer
-
-    def list(self, request, pk):
-        teacher = request.GET.get('teacher')
-        student = Student.objects.filter(teacher=teacher)
-        students = []
-        for i in students:
-             if student.teacher_id == Teacher_id:
-                students.append(student.teacher_id)
-        return Response(students)
-            
+    def create(self, request):
+        data = RegistrationSerializer(data=request.data)
+        if data.is_valid():
+            data.save()
+            return Response({"success": True})
+        else:
+            return Response({"success": False})
 
 
+class GetRegistrationView(ListAPIView):
+    queryset = Registration.objects.all()
+    serializer_class = RegistrationSerializer
 
-    
+
+
+
