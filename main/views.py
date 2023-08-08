@@ -23,6 +23,11 @@ class TeacherView(ListAPIView):
     serializer_class = TeacherSerializer
 
 
+class GetTeacherId(RetrieveAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+
 class ActivTeacherView(ListAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
@@ -45,6 +50,11 @@ class GenderTeacherView(ListAPIView):
 
 
 class StudentView(ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+
+class GetStudentId(RetrieveAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
@@ -94,6 +104,7 @@ class GetRegistrationView(ListAPIView):
 
 
 class TeacherMoney(ListAPIView):
+    queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
 
     def get_queryset(self):
@@ -101,31 +112,44 @@ class TeacherMoney(ListAPIView):
         return teacher_money
 
 
-class StudentsWithTeachersBySubject(ListAPIView):
-    serializer_class = RegistrationSerializer
+class CreateStudent(CreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+    def create(self, request):
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": True})
+        else:
+            return Response({"success": False})
+
+
+class CreateTeacher(CreateAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
+
+    def create(self, request):
+        serializer = TeacherSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"success": True})
+        else:
+            return Response({"success": False})
+
+
+class StudentsByTeacher(ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
     def get_queryset(self):
-        subject_id = self.kwargs['subject_id']
-        return Registration.objects.filter(subject_id=subject_id).select_related('teacher')
+        teacher_id = self.kwargs['teacher_id']
+        return Student.objects.filter(teacher_id=teacher_id)
 
-    from rest_framework.views import APIView
-    from rest_framework.response import Response
-    from rest_framework import status
-    from .models import Registration
-    from .serializers import RegistrationSerializer
 
-    class StudentRegistration(APIView):
-        def post(self, request):
-            serializer = RegistrationSerializer(data=request.data)
-            if serializer.is_valid():
-                subject = serializer.validated_data['subject']
-                teacher = Teacher.objects.filter(subject=subject).order_by('-money').first()
+class TeacherByStudents(ListAPIView):
+    queryset = Teacher.objects.all()
+    serializer_class = TeacherSerializer
 
-                if teacher:
-                    registration = serializer.save(teacher=teacher)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                else:
-                    return Response({"message": "No teacher available for the selected subject."},
-                                    status=status.HTTP_400_BAD_REQUEST)
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        return Teacher.objects.annotate(num_students=models.Count('student')).order_by('-num_students')[:1]

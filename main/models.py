@@ -35,7 +35,7 @@ class Student(models.Model):
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, blank=True, null=True)
     activ = models.BooleanField(default=False)
     price = models.IntegerField(default=0)
 
