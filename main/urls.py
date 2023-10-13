@@ -20,4 +20,3 @@ urlpatterns = [
     path('teachers-students/<int:teacher_id>/', StudentsByTeacher.as_view()),
     path('teachers-by-students/', TeacherByStudents.as_view()),
 ]
-
